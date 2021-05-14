@@ -171,28 +171,15 @@ export enum BadLadsBanReply {
  */
 export enum BadLadsObjectFlags {
     None                = 0,
-
-    /**
-     * PlayerStates hold player information, they spawn the entire connection of a player, independent from the controlled object.
-     */
+    // PlayerStates hold player information, they spawn the entire connection of a player, independent from the controlled object.
 	PlayerStates        = 1 << 1,
-    
-    /**
-     * PlayerCharacters are just that, player characters. Each player has one, they can become invalid when player dies. A new one is assigned on spawn.
-     */
+    // PlayerCharacters are just that, player characters. Each player has one, they can become invalid when player dies. A new one is assigned on spawn.
 	PlayerCharacters    = 1 << 2,
-
 	Vehicles            = 1 << 3,
-
-    /**
-     * Estate volumes are build volumes that own everything inside of them. They own Doors, Buildables, Alarms.
-     * There can be more than 1 estate volume per building.
-     */
+    // Estate volumes are build volumes that own everything inside of them. They own Doors, Buildables, Alarms.
+    // There can be more than 1 estate volume per building.
 	EstateVolumes       = 1 << 4,
-
-    /**
-     * Estate objects are things like doors, elevators and alarms.
-     */
+    // Estate objects are things like doors, elevators and alarms.
 	EstateObjects	    = 1 << 5,
 	Buildables          = 1 << 6,
 	All                 = u8.MAX_VALUE
@@ -367,8 +354,7 @@ export function spawnObject(objectFlag: BadLadsObjectFlags, objectIndex: i32, tr
 /**
  * 
  * @param playerState 
- * @returns The unique id of the playerstate, under a Steam server this would a 64 bit SteamId. 
- * Returns 0 if playerstate was not found.
+ * @returns The unique id of the playerstate, under a Steam server this would a 64 bit SteamId. Return s0 if playerstate was not found.
  */
 // @ts-ignore
 @inline
@@ -404,7 +390,7 @@ export function banPlayer(playerState: BadLadsObject): BadLadsBanReply {
  * 
  * @param playerState 
  * @param newHealth The new health, if this is set to 0 the object will die. 
- * @returns Whether we have successfully set the living objects health.
+ * @returns whether we have successfully set the living objects health.
  */
 // @ts-ignore
 @inline
@@ -441,7 +427,7 @@ export function getEstateVolumeBuildables(estateVolume: BadLadsObject): Uint64Ar
  * @param itemId 
  * @param stackSize 
  * @param autoStack 
- * @returns whether the player received said item, could be false in cases of a full inventory. 
+ * @returns whether the player received said item, could be false in case of a full inventory. 
  */
 // @ts-ignore
 @inline
