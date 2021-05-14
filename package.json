@@ -1,9 +1,15 @@
 {
   "name": "as-badlads",
-  "author": "MarkJGx <mark.jg@chemicalheads> (https://chemicalheads.com, https://markjg.com)",
-  "version": "1.0.0",
+  "author": "markjg <mark.jg@chemicalheads> (https://chemicalheads.com, https://markjg.com)",
+  "version": "1.0.1",
   "description": "BadLads server plugin host API implementation in AssemblyScript.",
   "main": "assembly/index.ts",
+  "keywords": ["badlads", "assemblyscript", "api", "server", "plugin", "mmo", "roleplay"],
+  "homepage": "https://badlads.chemicalheads.com",
+  "repository": {
+    "type": "git",
+    "url": "github.com/chemicalHeadsStudios/as-badlads"
+  },
   "scripts": {
     "test": "node tests",
     "asbuild:untouched": "asc assembly/index.ts --target debug",
