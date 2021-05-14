@@ -330,6 +330,8 @@ export function getObjectTransform(objectId: BadLadsObject): Transform | null {
  * @param objectFlag Must be a single flag.
  * @returns 
  */
+// @ts-ignore
+@inline
 export function getObjectFlagClassName(objectFlag: BadLadsObjectFlags) : string {
     return decodeString(__hostGetObjectClassNameOwnedString(objectFlag));
 }
@@ -354,7 +356,7 @@ export function spawnObject(objectFlag: BadLadsObjectFlags, objectIndex: i32, tr
 /**
  * 
  * @param playerState 
- * @returns The unique id of the playerstate, under a Steam server this would a 64 bit SteamId. Return s0 if playerstate was not found.
+ * @returns The unique id of the playerstate, under a Steam server this would a 64 bit SteamId. Returns 0 if playerstate was not found.
  */
 // @ts-ignore
 @inline
