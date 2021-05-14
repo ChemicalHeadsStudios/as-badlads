@@ -1,2 +1,2 @@
 # as-badlads
-BadLads API implementation in AssemblyScript. 
+BadLads server plugin host API implementation in AssemblyScript. 
