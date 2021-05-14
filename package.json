@@ -1,5 +1,6 @@
 {
   "name": "as-badlads",
+  "author": "MarkJGx <mark.jg@chemicalheads> (https://chemicalheads.com, https://markjg.com)",
   "version": "1.0.0",
   "description": "BadLads server plugin host API implementation in AssemblyScript.",
   "main": "assembly/index.ts",
@@ -9,8 +10,7 @@
     "asbuild:optimized": "asc assembly/index.ts --target release",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "assemblyscript": "^0.18.28"
   }
