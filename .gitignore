@@ -9,3 +9,4 @@ raw/
 .vscode
 .idea
 *.code-workspace
+build

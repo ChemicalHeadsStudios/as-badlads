@@ -1,8 +1,8 @@
 {
-  "name": "assemblyscriptplugin",
+  "name": "as-badlads",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "BadLads server plugin host API implementation in AssemblyScript.",
+  "main": "assembly/index.ts",
   "scripts": {
     "test": "node tests",
     "asbuild:untouched": "asc assembly/index.ts --target debug",
@@ -11,9 +11,6 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@assemblyscript/loader": "^0.18.28"
-  },
   "devDependencies": {
     "assemblyscript": "^0.18.28"
   }

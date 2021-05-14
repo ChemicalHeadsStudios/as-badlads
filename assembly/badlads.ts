@@ -1,22 +1,50 @@
+/**
+ * BadLads plugin import function signatures. The current plugin BadLads plugin implementation lacks any runtime event registartion... 
+ * it simply scans the WASM for matching event signatures and ticks them off. The scan is done on plugin load/hot-reload. 
+ * These cannot have an outer namespace/scope, must be defined on the global scope aka "". If you don't know what that means -- don't worry about it.
+ * 
+ * ```typescript
+ * export function onPluginStop(pluginId: i32): void {} 
+ * export function onPluginStart(pluginId: i32): void {}
+ * export function onPluginTick(deltaTime: f64): void {}
+ * export function onPlayerLogin(playerState: BadLadsObject): void {}
+ * export function onPlayerLogout(playerState: BadLadsObject): void {}
+ * export function onPlayerChatMessage(playerState: BadLadsObject, messageBuffer: ArrayBuffer, channel_index: i32): bool {return true;}
+ * export function onLivingDeath(livingObject: BadLadsObject): void {}
+ * ```
+ * 
+ * Some comments are written as an implementation guide for other languages.  
+ **/
+export declare type HOVER_OVER_ME_README = bool;
 
 /**
  * A BadLads Object id (64 bit unsigned integer). Consists of a pointer like id that the host uses for object lookups. 
  * The first 32 starting bits are reserved for the object search flags (8 bits from the beginning), the next 32 bits represent the actual object id.
- * Internally BadLads uses Object Hash Buckets to lookup an object, this means object lookups are quite fast.
+ * Internally BadLads uses object hash buckets to lookup an object, this means object lookups are quite fast.
  */
 export declare type BadLadsObject = u64;
+
+// === Start Host function signatures === 
+// Do not use these. Use the function wrappers below.
 export declare function __hostPostPlayerChatMessage(playerState: BadLadsObject, string_ptr: ArrayBuffer, num_char: i32, color: i32, isServerMessage: bool): void
-export declare function __hostGlobalPostChatMessage(string_ptr: ArrayBuffer, num_char: i32, color: i32, isServerMessage: bool): void
+export declare function __hostPostGlobalChatMessage(string_ptr: ArrayBuffer, num_char: i32, color: i32, isServerMessage: bool): void
 export declare function __hostGetObjectIdsOwnedUInt64s(objectTypeFlags: u32) : ArrayBuffer;
+
+/**
+ * Function suffixed with `Owned` mean we own that pointer and are responsible for it's deletion. Owned types are usually ArrayBuffers.
+ */
 export declare function __hostGetBadLadsVersionOwnedString() : ArrayBuffer;
+export declare function __hostGetObjectClassNameOwnedString(objectTypeFlag: u32): ArrayBuffer;
+export declare function __hostGetObjectTranformOwnedF32s(objectId: BadLadsObject) : ArrayBuffer;
+export declare function __hostGetObjectBoundsOwnedF32s(object: BadLadsObject): ArrayBuffer;
+export declare function __hostGetPlayerNameOwnedString(playerState: BadLadsObject): ArrayBuffer;
+export declare function __hostGetPlayerJobOwnedString(playerState: BadLadsObject): ArrayBuffer;
+
 export declare function __hostSetObjectTransform(objectId: BadLadsObject, x: f32, y: f32, z: f32, 
     pitch: f32, yaw: f32, roll: f32, scaleX: f32, scaleY: f32, scaleZ: f32) : bool;
-export declare function __hostGetObjectTranformOwnedF32s(objectId: BadLadsObject) : ArrayBuffer;
 export declare function __hostSetObjectHealth(objectId: BadLadsObject, NewHealth: i32): bool;
-export declare function __hostGetObjectClassNameOwnedString(objectTypeFlag: u32): ArrayBuffer;
 export declare function __hostSpawnObject(objectTypeFlag: u32, objectId: u32, asyncSpawn: bool,  x: f32, y: f32, z: f32, 
     pitch: f32, yaw: f32, roll: f32, scaleX: f32, scaleY: f32, scaleZ: f32): BadLadsObject;
-export declare function __hostGetPlayerNameOwnedString(playerState: BadLadsObject): ArrayBuffer;
 export declare function __hostGetPlayerAccountId(playerState: BadLadsObject): u64;
 export declare function __hostKickPlayerAccountId(playerAccountId: u64) : bool;
 export declare function __hostBanPlayerAccountId(playerAccountId: u64) : BadLadsBanReply;
@@ -25,12 +53,40 @@ export declare function __hostIsPlayerAccountIdBanned(playerAccountId: u64): boo
 export declare function __hostSetDoorState(estateObject: BadLadsObject, stateAndSide: i32): bool;
 export declare function __hostGetEstateBuildableObjectsUInt64s(estateVolume: BadLadsObject): ArrayBuffer;
 export declare function __hostGivePlayerStateItem(playerStateObject: BadLadsObject, itemId: i32, stackSize: i32, autoStack: bool): bool;
-export declare function __hostGetObjectBoundsOwnedF32s(object: BadLadsObject): ArrayBuffer;
 export declare function __hostSetPlayerJob(playerState: BadLadsObject, jobName: ArrayBuffer, jobNameLength: u32, bBroadcastBecome: bool, 
     bCheckForAvailability: bool, bTryRespawn: bool, bWasDemoted: bool, bForceRespawn: bool): bool;
-export declare function __hostGetPlayerJobOwnedString(playerState: BadLadsObject): ArrayBuffer;
 export declare function __hostIsObjectValid(object: BadLadsObject): bool;
 export declare function __hostGetPlayerStateCharacter(playerState: BadLadsObject): BadLadsObject;
+
+
+// The three functions below are responsible for guest memory allocation. We allocate a piece of memory when we want to pass a string or any kind of buffer to the guest (us).
+// !!! @fixme: These are commented out because AssemblyScript doesn't have a way to force export functions. 
+// As a workaround we we rely on the `--exportRuntime` config setting for now. We want to export the three functions below so the user doesn't have to add `--exportRuntime`. 
+//
+// tldr: implement `__new(numBytes: i32, classId: i32): i32`, `__pin(pointer: i32): i32`, `__unpin(pointer: i32): void` in your languages implementation.
+
+// //@ts-ignore
+// export function __guest_alloc(numBytes: i32, classId: i32): i32 {
+//     // The classId is not used at the moment, you can safely ignore it in the implementation.
+//     //@ts-ignore
+//     return __new(numBytes, classId);
+// };
+
+// // When implementing in another language, `__guest_pin` can safely be ignored as it's only relevant when GC is around.
+// //@ts-ignore
+// export function __guest_pin(pointer: i32): i32 {
+//     //@ts-ignore
+//     return __pin(pointer);
+// };
+
+// //@ts-ignore
+// export function __guest_free(pointer: i32): void {
+//     //@ts-ignore
+//     __unpin(pointer);
+// };
+
+
+// === End host function signatures. ===
 
 /**
  * Generic 3 dimensional vector class, no vector math has been implemented.
@@ -109,23 +165,41 @@ export enum BadLadsBanReply {
  * ```typescript
  * // Single object flag.
  * const onlyVehiclesFlags = BadLadsObjectFlags.Vehicles;
-* // Multiple object flag.
+ * // Multiple object flag.
  * const vehiclesAndBuildablesFlags = BadLadsObjectFlags.Vehicles | BadLadsObjectFlags.Buildables;
  * ```
  */
 export enum BadLadsObjectFlags {
     None                = 0,
+
+    /**
+     * PlayerStates hold player information, they spawn the entire connection of a player, independent from the controlled object.
+     */
 	PlayerStates        = 1 << 1,
+    
+    /**
+     * PlayerCharacters are just that, player characters. Each player has one, they can become invalid when player dies. A new one is assigned on spawn.
+     */
 	PlayerCharacters    = 1 << 2,
+
 	Vehicles            = 1 << 3,
+
+    /**
+     * Estate volumes are build volumes that own everything inside of them. They own Doors, Buildables, Alarms.
+     * There can be more than 1 estate volume per building.
+     */
 	EstateVolumes       = 1 << 4,
+
+    /**
+     * Estate objects are things like doors, elevators and alarms.
+     */
 	EstateObjects	    = 1 << 5,
 	Buildables          = 1 << 6,
 	All                 = u8.MAX_VALUE
 }
 
 /**
- * A generic color class, internally represented as 3 unsigned 8 bit integers. (0-255, 0-255, 0-255)
+ * A generic color class, internally represented as three unsigned 8 bit integers. (0-255, 0-255, 0-255)
  */
 export class Color {
     r: u8;
@@ -191,7 +265,7 @@ export function isObjectValid(object: BadLadsObject): bool {
 @inline
 export function postGlobalChatMessage(messageString: string, color: Color = Color.WHITE, isEventful: bool = false): void {
     const messageBuffer = String.UTF8.encode(messageString, true);
-    __hostGlobalPostChatMessage(messageBuffer, messageBuffer.byteLength, color.toPackedBGR(), isEventful);
+    __hostPostGlobalChatMessage(messageBuffer, messageBuffer.byteLength, color.toPackedBGR(), isEventful);
 }
 
 // @ts-ignore
@@ -353,7 +427,7 @@ export function setDoorState(doorObject: BadLadsObject, state: i32): bool {
 /**
  * Returns all the owned buildables by the estate volume.
  * @param estateVolume 
- * @returns 
+ * @returns All of the Estate Volume objects owned buildables, represented as BadLadsObject id's. 
  */
 // @ts-ignore
 @inline
@@ -362,7 +436,7 @@ export function getEstateVolumeBuildables(estateVolume: BadLadsObject): Uint64Ar
 }
 
 /**
- * Give a 
+ * Give a playerState an item.
  * @param playerState 
  * @param itemId 
  * @param stackSize 
