@@ -5,10 +5,10 @@
   "description": "BadLads server plugin host API implementation in AssemblyScript.",
   "main": "assembly/index.ts",
   "keywords": ["badlads", "assemblyscript", "api", "server", "plugin", "mmo", "roleplay"],
-  "homepage": "https://badlads.chemicalheads.com",
+  "homepage": "https://github.com/chemicalHeadsStudios/as-badlads",
   "repository": {
     "type": "git",
-    "url": "github.com/chemicalHeadsStudios/as-badlads"
+    "url": "https://github.com/chemicalHeadsStudios/as-badlads"
   },
   "scripts": {
     "test": "node tests",
@@ -16,7 +16,10 @@
     "asbuild:optimized": "asc assembly/index.ts --target release",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
-  "license": "MIT",
+  "licenses": [{
+    "type": "MIT",
+    "url" : "http://en.wikipedia.org/wiki/MIT_License"
+  }],
   "devDependencies": {
     "assemblyscript": "^0.18.28"
   }
