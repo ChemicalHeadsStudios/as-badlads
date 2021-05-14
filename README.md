@@ -6,3 +6,7 @@
 ===
 BadLads server plugin host API implementation in AssemblyScript. Documentation coming soon! 
 
+## What is as-badlads?
+> `as-badlads` is a BadLads WebAssembly host implementation, used for BadLads server plugins. The `as` prefix stands for [AssemblyScript](assemblyscript.org/), which is what the API is written in.
+
+Getting started with `as-badlads`
