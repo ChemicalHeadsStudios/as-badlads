@@ -16,15 +16,17 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 > [Node](https://nodejs.org/en/). While we don't use Javascript in any way whatsoever, we require the npm package manager which is bundled with node.
 
 ## Quick Start with `as-badlads`
-1. Find your BadLads plugins folder, named `BadLadsPluginS`, under Windows it'll be located under `C:\Users\yourusername\AppData\Local\BadLads\Saved`. 
+1. Find your BadLads plugins folder, named `BadLadsPlugins`, under Windows it'll be located under `C:\Users\yourusername\AppData\Local\BadLads\Saved`. 
 2. Create a new directory in `BadLadsPlugins`, this will be the root directory of your plugin. Go inside your new plugin directory.
 3. Create a **workspace** with `npm init`
 4. Install **AssemblyScript** with: `npm install --save-dev assemblyscript`
 5. Install the **BadLads API** with `npm install @chemicalheads/as-badlads`
 6. Setup your AssemblyScript workspace with `npm asinit .`
-7. Create a `plugin.json` file. **Must be all lowercase!** Here's a [template.](https://gist.githubusercontent.com/MarkJGx/a67a1b400aa998086e08d9acf17c12ef/raw/35e5d2475ff153b3e7db31783be5b42c28fe6cb1/plugin.json).
+7. Create a `plugin.json` file. **Must be all lowercase!** Here's a [template.](https://gist.githubusercontent.com/MarkJGx/a67a1b400aa998086e08d9acf17c12ef/raw/35e5d2475ff153b3e7db31783be5b42c28fe6cb1/plugin.json)
 8. Add `exportRuntime: true` to the `release` and `debug` targets in `asconfig.json`. That might sound confusing, so here's a [copyable example.](https://gist.githubusercontent.com/MarkJGx/f0e8f0aa12aef48f1dfb74a8dce34472/raw/3e8fca7853f8a65a00eedb92a7acc641e7503247/asconfig.json).
 9. You are done with the setup process. Congrats. Let's move on to the fun part!
 10. Open your favorite TypeScript compatible IDE (mine being [VSCode](https://code.visualstudio.com/)), and add the plugin directory as a workspace/folder/whatever.
-11. Open up the `assembly/index.ts` file and start cracking. [Here's an example `index.ts`](https://gist.githubusercontent.com/MarkJGx/b13603d892ba6dfc3d372745f7092082/raw/7b4504b20bb15942e35b204b1cf4b48b908defae/index.ts). If you want to explore the plugin API's functionality, middle click on one of the imports at the top. That will take you the plugin definitions, filled with documentation and goodies. Make sure to scroll down to skip the rough stuff.
-12. Compile, run `npm run asbuild`. You can open the Sandbox mode in BadLads and start working, by default the game has hot reload enabled. If you want to check for new plugins while the game is open, run the `/reloadplugins` command in chat. The game will tell you when you have hot reloaded, or if you have any weird errors.
+11. Open up the `assembly/index.ts` file and start cracking. [Here's an example `index.ts`](https://gist.githubusercontent.com/MarkJGx/b13603d892ba6dfc3d372745f7092082/raw/7b4504b20bb15942e35b204b1cf4b48b908defae/index.ts). 
+> If you want to explore the plugin API's functionality, middle click on one of the imports at the top. That will take you the plugin definitions, filled with documentation and goodies. Make sure to scroll down to skip the rough stuff.
+13. Compile, run `npm run asbuild`. You can open the Sandbox mode in BadLads and start working, by default the game has hot reload enabled.
+> If you want to check for new plugins while the game is open, run the `/reloadplugins` command in chat. The game will tell you when you have hot reloaded, or if you have any weird errors.
