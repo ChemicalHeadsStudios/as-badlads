@@ -5,7 +5,7 @@
   "description": "BadLads server plugin host API implementation in AssemblyScript.",
   "main": "assembly/index.ts",
   "keywords": ["badlads", "assemblyscript", "api", "server", "plugin", "mmo", "roleplay"],
-  "homepage": "https://github.com/chemicalHeadsStudios/as-badlads",
+  "homepage": "https://badlads.chemicalheads.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/chemicalHeadsStudios/as-badlads"
