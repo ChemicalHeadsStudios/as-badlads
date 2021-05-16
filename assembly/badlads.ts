@@ -190,7 +190,7 @@ export enum BadLadsObjectFlags {
 export enum BadLadsCollisionChannel {
     WorldStatic,
     WorldDynamic,
-    Pawn,
+    PlayerObjects,
     Visibility,
     Camera,
     PhysicsBody,
@@ -461,6 +461,8 @@ export function giveItem(playerState: BadLadsObject, itemId: i32, stackSize: i32
  * @param object 
  * @returns a static array of 2 vectors. 1st one being the center of the bounds, second one being the extents.
  */
+// @ts-ignore
+@inline
 export function getObjectBounds(object: BadLadsObject): StaticArray<Vector> {
     var array = new StaticArray<Vector>(2);
     var centerAndBounds = Float32Array.wrap(__hostGetObjectBoundsOwnedF32s(object));
@@ -482,4 +484,17 @@ export function setPlayerJob(playerState: BadLadsObject, job: string, bBroadcast
     const jobBuffer = String.UTF8.encode(job, true);
 
     return __hostSetPlayerJob(playerState, jobBuffer, jobBuffer.byteLength, bBroadcastBecome, bCheckForAvailability, bTryRespawn, bWasDemoted, bForceRespawn);
+}
+
+/**
+ * Traces a line through a select collision world  
+ * @param start The start of the line.
+ * @param end The end of the line.
+ * @param collisionChannel 
+ * @returns distance to collision, if any.
+ */
+// @ts-ignore
+@inline
+export function rayTrace(start: Vector, end: Vector, collisionChannel: BadLadsCollisionChannel = BadLadsCollisionChannel.WorldStatic, ignoredObject: BadLadsObject = 0): f32 {
+    return __hostRaytrace(ignoredObject, collisionChannel, start.x, start.y, start.z, end.x, end.y, end.z);
 }
