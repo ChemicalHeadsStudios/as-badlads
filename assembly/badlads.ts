@@ -10,7 +10,8 @@
  * export function onPlayerLogin(playerState: BadLadsObject): void {}
  * export function onPlayerLogout(playerState: BadLadsObject): void {}
  * export function onPlayerChatMessage(playerState: BadLadsObject, messageBuffer: ArrayBuffer, channel_index: i32): bool {return true;}
- * export function onLivingDeath(livingObject: BadLadsObject): void {}
+ * export function onLivingDeath(victim: BadLadsObject, killerPlayerState: BadLadsObject): void {}
+ * export function onBecomeJob(playerState: BadLadsObject, jobName: ArrayBuffer): void {}
  * ```
  * 
  * Some comments are written as an implementation guide for other languages.  
@@ -35,14 +36,14 @@ export declare function __hostGetObjectIdsOwnedUInt64s(objectTypeFlags: u32) : A
  */
 export declare function __hostGetBadLadsVersionOwnedString() : ArrayBuffer;
 export declare function __hostGetObjectClassNameOwnedString(objectTypeFlag: u32): ArrayBuffer;
-export declare function __hostGetObjectTranformOwnedF32s(objectId: BadLadsObject) : ArrayBuffer;
+export declare function __hostGetObjectTranformOwnedF32s(object: BadLadsObject) : ArrayBuffer;
 export declare function __hostGetObjectBoundsOwnedF32s(object: BadLadsObject): ArrayBuffer;
 export declare function __hostGetPlayerNameOwnedString(playerState: BadLadsObject): ArrayBuffer;
 export declare function __hostGetPlayerJobOwnedString(playerState: BadLadsObject): ArrayBuffer;
 
-export declare function __hostSetObjectTransform(objectId: BadLadsObject, x: f32, y: f32, z: f32, 
+export declare function __hostSetObjectTransform(object: BadLadsObject, x: f32, y: f32, z: f32, 
     pitch: f32, yaw: f32, roll: f32, scaleX: f32, scaleY: f32, scaleZ: f32) : bool;
-export declare function __hostSetObjectHealth(objectId: BadLadsObject, NewHealth: i32): bool;
+export declare function __hostSetObjectHealth(object: BadLadsObject, NewHealth: i32): bool;
 export declare function __hostSpawnObject(objectTypeFlag: u32, objectId: u32, asyncSpawn: bool,  x: f32, y: f32, z: f32, 
     pitch: f32, yaw: f32, roll: f32, scaleX: f32, scaleY: f32, scaleZ: f32): BadLadsObject;
 export declare function __hostGetPlayerAccountId(playerState: BadLadsObject): u64;
@@ -57,6 +58,7 @@ export declare function __hostSetPlayerJob(playerState: BadLadsObject, jobName: 
     bCheckForAvailability: bool, bTryRespawn: bool, bWasDemoted: bool, bForceRespawn: bool): bool;
 export declare function __hostIsObjectValid(object: BadLadsObject): bool;
 export declare function __hostGetPlayerStateCharacter(playerState: BadLadsObject): BadLadsObject;
+export declare function __hostRaytrace(ignoredObject: BadLadsObject, collisionChannel: i32, startX: f32, startY: f32, startZ: f32, endX: f32, endY: f32, endZ: f32): f32
 
 
 // The three functions below are responsible for guest memory allocation. We allocate a piece of memory when we want to pass a string or any kind of buffer to the guest (us).
@@ -183,6 +185,24 @@ export enum BadLadsObjectFlags {
 	EstateObjects	    = 1 << 5,
 	Buildables          = 1 << 6,
 	All                 = u8.MAX_VALUE
+}
+
+export enum BadLadsCollisionChannel {
+    WorldStatic,
+    WorldDynamic,
+    Pawn,
+    Visibility,
+    Camera,
+    PhysicsBody,
+    Destructible,
+    __Unused01,
+    __Unused02,
+    __Unused03,
+    __Unused04,
+    __Unused05,
+    __Unused06,
+    Interactable,
+    Hitscan
 }
 
 /**
