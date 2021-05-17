@@ -59,6 +59,7 @@ export declare function __hostSetPlayerJob(playerState: BadLadsObject, jobName: 
 export declare function __hostIsObjectValid(object: BadLadsObject): bool;
 export declare function __hostGetPlayerStateCharacter(playerState: BadLadsObject): BadLadsObject;
 export declare function __hostRaytrace(ignoredObject: BadLadsObject, collisionChannel: i32, startX: f32, startY: f32, startZ: f32, endX: f32, endY: f32, endZ: f32): f32
+export declare function __hostGetGameTime(): f64;
 
 
 // The three functions below are responsible for guest memory allocation. We allocate a piece of memory when we want to pass a string or any kind of buffer to the guest (us).
@@ -490,11 +491,21 @@ export function setPlayerJob(playerState: BadLadsObject, job: string, bBroadcast
  * Traces a line through a select collision world  
  * @param start The start of the line.
  * @param end The end of the line.
- * @param collisionChannel 
+ * @param collisionChannel collision world channel.
  * @returns distance to collision, if any.
  */
 // @ts-ignore
 @inline
 export function rayTrace(start: Vector, end: Vector, collisionChannel: BadLadsCollisionChannel = BadLadsCollisionChannel.WorldStatic, ignoredObject: BadLadsObject = 0): f32 {
     return __hostRaytrace(ignoredObject, collisionChannel, start.x, start.y, start.z, end.x, end.y, end.z);
+}
+
+/**
+ * 
+ * @returns server game time in seconds.
+ */
+// @ts-ignore
+@inline
+export function getGameTime(): f64  {
+    return __hostGetGameTime();
 }
