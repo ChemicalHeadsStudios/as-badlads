@@ -60,6 +60,7 @@ export declare function __hostIsObjectValid(object: BadLadsObject): bool;
 export declare function __hostGetPlayerStateCharacter(playerState: BadLadsObject): BadLadsObject;
 export declare function __hostRaytrace(ignoredObject: BadLadsObject, collisionChannel: i32, startX: f32, startY: f32, startZ: f32, endX: f32, endY: f32, endZ: f32): f32
 export declare function __hostGetGameTime(): f64;
+export declare function __hostGetEconomyCurrencyValue(): f32;
 
 
 // The three functions below are responsible for guest memory allocation. We allocate a piece of memory when we want to pass a string or any kind of buffer to the guest (us).
@@ -180,7 +181,8 @@ export enum BadLadsObjectFlags {
 	PlayerCharacters    = 1 << 2,
 	Vehicles            = 1 << 3,
     // Estate volumes are build volumes that own everything inside of them. They own Doors, Buildables, Alarms.
-    // There can be more than 1 estate volume per building.
+    // There can be more than 1 estate volume per building. You can check whether a player is in a estate volume by checking bounds intersections.
+    // Bounds can be got through getObjectBounds
 	EstateVolumes       = 1 << 4,
     // Estate objects are things like doors, elevators and alarms.
 	EstateObjects	    = 1 << 5,
@@ -508,4 +510,10 @@ export function rayTrace(start: Vector, end: Vector, collisionChannel: BadLadsCo
 @inline
 export function getGameTime(): f64  {
     return __hostGetGameTime();
+}
+
+// @ts-ignore
+@inline
+export function getEconomyCurrencyValue(): f32 {
+    return __hostGetEconomyCurrencyValue();
 }
