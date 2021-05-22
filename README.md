@@ -37,15 +37,15 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 ***
 
 ## Listening for events. Check out the top in the `as-badlads/assembly/badlads.ts` file for all the available event functions. 
-```typescript
+> ```typescript
 // BadLads searches for matching functions on plugin load, when listening for a specific event your function event has to match it's name/param types/return types.
 export function onPluginStop(pluginId: i32): void {} 
 ```
 
 ## Decoding string buffers. Certain event functions have an ArrayBuffer as a param, most of the time that's a string buffer. You can convert an ArrayBuffer to a string with.
-```typescript
+> ```typescript
 const myString: string = decodeString(stringBuffer);
 ```
 
 ## What are the `__host` functions?
-`__host` are linked with the the BadLads API. They aren't very convenient to work with, that's why there's a wrapper for almost each one. If you know what you are doing, go ahead and touch them.
+> `__host` are linked with the the BadLads API. They aren't very convenient to work with, that's why there's a wrapper for almost each one. If you know what you are doing, go ahead and touch them.
