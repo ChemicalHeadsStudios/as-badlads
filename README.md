@@ -34,7 +34,7 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 13. Compile, run `npm run asbuild`. You can open the Sandbox mode in BadLads and start working, by default the game has hot reload enabled.
 > If you want to check for new plugins while the game is open, run the `/reloadplugins` command in chat. The game will tell you when you have hot reloaded, or if you have any weird errors.
 
-===
+===============
 
 ## Listening for events. Check out the top in the `as-badlads/assembly/badlads.ts` file for all the available event functions. 
 ```typescript
