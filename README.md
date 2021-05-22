@@ -15,7 +15,10 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 ## Prerequisites
 > [Node](https://nodejs.org/en/). While we don't use Javascript in any way whatsoever, we require the npm package manager which is bundled with node.
 
-## Quick Start with `as-badlads`
+## Example plugins:
+* https://github.com/ChemicalHeadsStudios/as-badlads-template
+
+## Creating a BadLads plugin from scratch with `as-badlads`
 1. Find your BadLads plugins folder, named `BadLadsPlugins`, under Windows it'll be located under `C:\Users\yourusername\AppData\Local\BadLads\Saved`. 
 2. Create a new directory in `BadLadsPlugins`, this will be the root directory of your plugin. Go inside your new plugin directory.
 3. Create a **workspace** with `npm init`
