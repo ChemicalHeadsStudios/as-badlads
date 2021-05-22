@@ -21,7 +21,7 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 3. Create a **workspace** with `npm init`
 4. Install **AssemblyScript** with: `npm install --save-dev assemblyscript`
 5. Install the **BadLads API** with `npm install @chemicalheads/as-badlads`
-6. Setup your AssemblyScript workspace with `npm asinit .`
+6. Setup your AssemblyScript workspace with `npx asinit .`
 7. Create a `plugin.json` file. **Must be all lowercase!** Here's a [template.](https://gist.githubusercontent.com/MarkJGx/a67a1b400aa998086e08d9acf17c12ef/raw/35e5d2475ff153b3e7db31783be5b42c28fe6cb1/plugin.json)
 8. Add `exportRuntime: true` to the `release` and `debug` targets in `asconfig.json`. That might sound confusing, so here's a [copyable example.](https://gist.githubusercontent.com/MarkJGx/f0e8f0aa12aef48f1dfb74a8dce34472/raw/3e8fca7853f8a65a00eedb92a7acc641e7503247/asconfig.json).
 9. You are done with the setup process. Congrats. Let's move on to the fun part!
