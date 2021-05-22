@@ -19,7 +19,7 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 * https://github.com/ChemicalHeadsStudios/as-badlads-template
 
 ## Creating a BadLads plugin from scratch with `as-badlads`
-1. Find your BadLads plugins folder, named `BadLadsPlugins`, under Windows it'll be located under `C:\Users\yourusername\AppData\Local\BadLads\Saved`. 
+1. Find your BadLads plugins folder, named `BadLadsPlugins`, under Windows clients it'll be located under `C:\Users\yourusername\AppData\Local\BadLads\Saved` or `YourServerDirectory\BadLads\Saved\`. 
 2. Create a new directory in `BadLadsPlugins`, this will be the root directory of your plugin. Go inside your new plugin directory.
 3. Create a **workspace** with `npm init`
 4. Install **AssemblyScript** with: `npm install --save-dev assemblyscript`
@@ -33,3 +33,17 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 > If you want to explore the plugin API's functionality, middle click on one of the imports at the top. That will take you the plugin definitions, filled with documentation and goodies. Make sure to scroll down to skip the rough stuff.
 13. Compile, run `npm run asbuild`. You can open the Sandbox mode in BadLads and start working, by default the game has hot reload enabled.
 > If you want to check for new plugins while the game is open, run the `/reloadplugins` command in chat. The game will tell you when you have hot reloaded, or if you have any weird errors.
+
+## Listening for events. Check out the top in the `as-badlads/assembly/badlads.ts` file for all the available event functions. 
+```typescript
+// BadLads searches for matching functions on plugin load, when listening for a specific event your function event has to match it's name/param types/return types.
+export function onPluginStop(pluginId: i32): void {} 
+```
+
+## Decoding string buffers. Certain event functions have an ArrayBuffer as a param, most of the time that's a string buffer. You can convert an ArrayBuffer to a string with.
+```typescript
+const myString: string = decodeString(stringBuffer);
+```
+
+## What are the `__host` functions?
+`__host` are linked with the the BadLads API. They aren't very convenient to work with, that's why there's a wrapper for almost each one. If you know what you are doing, go ahead and touch them.
