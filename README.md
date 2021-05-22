@@ -50,4 +50,4 @@ const myString: string = decodeString(stringBuffer);
 ```
 
 ## What are the `__host` functions?
-> `__host` are linked with the the BadLads API. They aren't very convenient to work with, that's why there's a wrapper for almost each one. If you know what you are doing, go ahead and touch them.
+> Functions starting with `__host` are linked with the the BadLads API at load time. They aren't very convenient to work with, that's why there's a wrapper for almost each one. If you know what you are doing, go ahead and touch them.
