@@ -38,7 +38,9 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 
 ## Listening for events. Check out the top in the `as-badlads/assembly/badlads.ts` file for all the available event functions. 
 ```typescript
-// BadLads searches for matching functions on plugin load, when listening for a specific event your function event has to match it's name/param types/return types.
+// BadLads searches for matching functions on plugin load, when listening 
+...for a specific event your function event has to match...
+...it's name/param types/return types.
 export function onPluginStop(pluginId: i32): void {} 
 ```
 
