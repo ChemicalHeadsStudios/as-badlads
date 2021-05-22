@@ -41,7 +41,7 @@ BadLads server plugin host API implementation in AssemblyScript. Proper document
 // BadLads searches for matching functions on plugin load, when listening 
 //...for a specific event your function event has to match...
 //...it's name/param types/return types.
-export function onPluginStop(pluginId: i32): void {} 
+export function onPluginStart(pluginId: i32): void {} 
 ```
 
 ## Decoding string buffers. Certain event functions have an ArrayBuffer as a param, most of the time that's a string buffer. You can convert an ArrayBuffer to a string with.
