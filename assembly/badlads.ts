@@ -66,6 +66,15 @@ export declare function __hostRaytrace(ignoredObject: BadLadsObject, collisionCh
 export declare function __hostGetGameTime(): f64;
 export declare function __hostGetEconomyCurrencyValue(): f32;
 
+export declare function __hostGetPlayerStateItemsOwnedUInt64s(playerState: BadLadsObject, containerMask: i32): ArrayBuffer;
+export declare function __hostRemovePlayerStateItem(playerState: BadLadsObject, itemId: i32, amount: i32): i32;
+export declare function __hostGetItemDefinitionCount(): i32;
+export declare function __hostGetItemDefinitionNameOwnedString(itemId: i32): ArrayBuffer;
+export declare function __hostGetItemDefinitionIdByName(namePtr: ArrayBuffer, numChars: i32): i32;
+export declare function __hostGetObjectHealth(object: BadLadsObject): i32;
+export declare function __hostGetObjectMaxHealth(object: BadLadsObject): i32;
+export declare function __hostGetPlayerMoney(playerState: BadLadsObject): i32;
+
 
 // The three functions below are responsible for guest memory allocation. We allocate a piece of memory when we want to pass a string or any kind of buffer to the guest (us).
 // !!! @fixme: These are commented out because AssemblyScript doesn't have a way to force export functions. 
@@ -520,4 +529,138 @@ export function getGameTime(): f64  {
 @inline
 export function getEconomyCurrencyValue(): f32 {
     return __hostGetEconomyCurrencyValue();
+}
+
+/**
+ * Which of a player's containers to read. Combine with `|`.
+ */
+export enum BadLadsContainerFlags {
+    Inventory = 1 << 0,
+    Hotbar    = 1 << 1,
+    Equipment = 1 << 2,
+    Bank      = 1 << 3,
+    All       = 0xf,
+}
+
+/**
+ * One stack a player is carrying. Which container it came from is not reported - ask for one container at a
+ * time when that matters.
+ */
+export class ItemStack {
+    itemId: i32;
+    stackSize: i32;
+    uniqueId: u32;
+
+    constructor(itemId: i32, stackSize: i32, uniqueId: u32) {
+        this.itemId = itemId;
+        this.stackSize = stackSize;
+        this.uniqueId = uniqueId;
+    }
+
+    toString(): string {
+        return `(itemId: ${this.itemId}, stackSize: ${this.stackSize}, uniqueId: ${this.uniqueId})`
+    }
+}
+
+/**
+ * Everything a player is carrying in the requested containers. Empty slots are not reported.
+ * @param playerState
+ * @param containerMask Defaults to inventory and hotbar, which is what "carrying" usually means.
+ */
+export function getPlayerItems(playerState: BadLadsObject,
+    containerMask: BadLadsContainerFlags = BadLadsContainerFlags.Inventory | BadLadsContainerFlags.Hotbar): Array<ItemStack> {
+    const packed = Uint64Array.wrap(__hostGetPlayerStateItemsOwnedUInt64s(playerState, containerMask));
+    const stacks = new Array<ItemStack>();
+    for (let index = 0; index < packed.length; index++) {
+        const entry = packed[index];
+        stacks.push(new ItemStack(
+            <i32>(entry & 0xffff),
+            <i32>((entry >> 16) & 0xffff),
+            <u32>(entry >> 32)));
+    }
+    return stacks;
+}
+
+/**
+ * How many of an item a player is carrying, across the requested containers.
+ */
+export function getPlayerItemCount(playerState: BadLadsObject, itemId: i32,
+    containerMask: BadLadsContainerFlags = BadLadsContainerFlags.Inventory | BadLadsContainerFlags.Hotbar): i32 {
+    const stacks = getPlayerItems(playerState, containerMask);
+    let total = 0;
+    for (let index = 0; index < stacks.length; index++) {
+        if (stacks[index].itemId == itemId) {
+            total += stacks[index].stackSize;
+        }
+    }
+    return total;
+}
+
+/**
+ * Take items from a player.
+ * @returns how much could NOT be removed; 0 means the request was satisfied in full. Check this before granting
+ * whatever the removal was paying for, or a partial inventory becomes a free purchase.
+ */
+// @ts-ignore
+@inline
+export function removeItem(playerState: BadLadsObject, itemId: i32, amount: i32 = 1): i32 {
+    return __hostRemovePlayerStateItem(playerState, itemId, amount);
+}
+
+/**
+ * @returns the number of item definition slots. Slots may be empty, so do not treat an empty name as the end.
+ */
+// @ts-ignore
+@inline
+export function getItemDefinitionCount(): i32 {
+    return __hostGetItemDefinitionCount();
+}
+
+/**
+ * @returns the stable class name of an item definition, or an empty string if that id has no definition.
+ */
+// @ts-ignore
+@inline
+export function getItemDefinitionName(itemId: i32): string {
+    return decodeString(__hostGetItemDefinitionNameOwnedString(itemId));
+}
+
+/**
+ * Resolve an item name to its id. Prefer this over hardcoding an id: ids are indices into an authored array and
+ * change meaning when that array is reordered.
+ * @returns the id, or -1 if no definition carries that name.
+ */
+// @ts-ignore
+@inline
+export function getItemDefinitionIdByName(name: string): i32 {
+    const nameBuffer = String.UTF8.encode(name, true);
+    return __hostGetItemDefinitionIdByName(nameBuffer, nameBuffer.byteLength);
+}
+
+/**
+ * @returns current health, or -1 if the object has no living component.
+ */
+// @ts-ignore
+@inline
+export function getLivingHealth(object: BadLadsObject): i32 {
+    return __hostGetObjectHealth(object);
+}
+
+/**
+ * @returns maximum health, or -1 if the object has no living component. setLivingHealth clamps to this, so read
+ * it before healing or damaging by a fraction.
+ */
+// @ts-ignore
+@inline
+export function getLivingMaxHealth(object: BadLadsObject): i32 {
+    return __hostGetObjectMaxHealth(object);
+}
+
+/**
+ * @returns the player's balance, or -1 if it could not be read.
+ */
+// @ts-ignore
+@inline
+export function getPlayerMoney(playerState: BadLadsObject): i32 {
+    return __hostGetPlayerMoney(playerState);
 }
