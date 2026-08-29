@@ -51,3 +51,42 @@ const myString: string = decodeString(stringBuffer);
 
 ### What are the `__host` functions?
 > Functions starting with `__host` are linked with the the BadLads API at load time. They aren't very convenient to work with, that's why there's a wrapper for almost each one. If you know what you are doing, go ahead and touch them.
+
+***
+
+### Passing strings to `__host` functions
+Every string buffer handed to a `__host` function must be **null terminated**, and the length you pass must
+**include** the terminator. That is what `String.UTF8.encode(myString, true)` plus `.byteLength` gives you, and it
+is what every wrapper in `badlads.ts` already does. Passing an unterminated buffer makes the host drop the last
+character.
+
+### Object ids
+Object ids are opaque 64-bit handles. They are stable for the lifetime of the object, compare equal for the same
+object, and are **never reused** — once an object is destroyed its id stays dead rather than later resolving to a
+different object. Store them freely, but call `isObjectValid` before acting on one you have held onto.
+
+### `__hostGetObjectTranformOwnedF32s` is deprecated
+The original import name was misspelled (`Tranform`). It is now `__hostGetObjectTransformOwnedF32s`. The host
+registers **both** names, so plugin binaries compiled against older versions of `as-badlads` keep working with no
+changes. If you call the raw import directly, move to the corrected spelling — the misspelled alias will be
+removed in a future release. Users of the `getObjectTransform` wrapper are unaffected.
+
+***
+
+## Server settings that affect plugins
+These live in `BadLadsServerSettings.ini` on the host and change how your plugin is executed.
+
+| Setting | Default | Effect |
+| --- | --- | --- |
+| `HotReloadEnabled` | `true` | Watches the plugins folder and reloads a plugin when its `.wasm` or `plugin.json` changes. |
+| `PluginTickRate` | `20` | Target `onPluginTick` rate in Hz. Clamped to the server's `MaxGameTickRate` — plugins run on the game thread and cannot tick faster than it. |
+| `PluginFuelPerCall` | `10000000000` | Deadlock watchdog. Fuel is spent per executed WASM instruction and refreshed before every call into your plugin, so it is a **per-call** ceiling, not a rate limit. Exceed it and that call traps; the plugin stays loaded and the next call runs normally. Set to `0` to disable (a plugin that hangs will then hang the server). |
+
+The budget is set far above what any reasonable callback uses, so hitting it means a runaway loop. If your plugin
+legitimately needs to do heavy work, spread it across several `onPluginTick` calls rather than raising the ceiling.
+
+### `onPluginTick` timing
+Plugins are spread across frames rather than all ticking on the same frame, and each plugin becomes due on its own
+schedule. Under server load the effective rate drops rather than plugin cost spiking — so **do not assume a fixed
+interval**. Always integrate against the `deltaTime` parameter, which is real elapsed server time. The first tick
+after load reports a delta of `0`.

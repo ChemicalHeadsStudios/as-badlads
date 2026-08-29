@@ -19,9 +19,13 @@
 export declare type HOVER_OVER_ME_README = bool;
 
 /**
- * A BadLads Object id (64 bit unsigned integer). Consists of a pointer like id that the host uses for object lookups. 
- * The first 32 starting bits are reserved for the object search flags (8 bits from the beginning), the next 32 bits represent the actual object id.
- * Internally BadLads uses object hash buckets to lookup an object, this means object lookups are quite fast.
+ * A BadLads Object id (64 bit unsigned integer). Consists of a pointer like id that the host uses for object lookups.
+ * The low 8 bits hold the object search flag; bits 32-63 hold the object serial. Treat the whole value as opaque.
+ *
+ * Serials are handed out in order and are never reused, so an id is stable for the lifetime of the object it names
+ * and stays dead once that object is destroyed - it will never start resolving to a different object later.
+ * Ids for the same object compare equal, so they are safe to store and use as map keys.
+ * Always confirm an id still resolves with `isObjectValid` before acting on it.
  */
 export declare type BadLadsObject = u64;
 
@@ -36,7 +40,7 @@ export declare function __hostGetObjectIdsOwnedUInt64s(objectTypeFlags: u32) : A
  */
 export declare function __hostGetBadLadsVersionOwnedString() : ArrayBuffer;
 export declare function __hostGetObjectClassNameOwnedString(objectTypeFlag: u32): ArrayBuffer;
-export declare function __hostGetObjectTranformOwnedF32s(object: BadLadsObject) : ArrayBuffer;
+export declare function __hostGetObjectTransformOwnedF32s(object: BadLadsObject) : ArrayBuffer;
 export declare function __hostGetObjectBoundsOwnedF32s(object: BadLadsObject): ArrayBuffer;
 export declare function __hostGetPlayerNameOwnedString(playerState: BadLadsObject): ArrayBuffer;
 export declare function __hostGetPlayerJobOwnedString(playerState: BadLadsObject): ArrayBuffer;
@@ -138,7 +142,7 @@ export class Rotation {
 }
 
 /**
- * A generic Trasnform most commonly used for objects in BadLads. Consists of a position vector, rotation vector and a scale vector.
+ * A generic Transform most commonly used for objects in BadLads. Consists of a position vector, rotation vector and a scale vector.
  */
 export class Transform {
     position: Vector;
@@ -338,7 +342,7 @@ export function setObjectTransform(object: BadLadsObject, transform: Transform):
 // @ts-ignore
 @inline
 export function getObjectTransform(objectId: BadLadsObject): Transform | null {
-    const transformBuffer: Float32Array = Float32Array.wrap(__hostGetObjectTranformOwnedF32s(objectId));
+    const transformBuffer: Float32Array = Float32Array.wrap(__hostGetObjectTransformOwnedF32s(objectId));
     if(transformBuffer != null) {
         return new Transform(
             new Vector(transformBuffer[0], transformBuffer[1], transformBuffer[2]), 
