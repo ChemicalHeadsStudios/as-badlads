@@ -1,0 +1,48 @@
+# Publishes to npm on a version tag, using npm trusted publishing rather than a long-lived token.
+#
+# The registry authenticates the workflow through GitHub's OIDC provider, so nothing secret is stored here and
+# there is no token to rotate or leak. This also sidesteps 2FA: passkey-based accounts have no OTP to type, and
+# npm is restricting the bypass tokens that used to fill that gap.
+#
+# One-time setup on npmjs.com, under the package's Settings -> Trusted Publisher:
+#   organization/repository: ChemicalHeadsStudios/as-badlads
+#   workflow filename:       publish.yml
+#
+# To release: bump the version in package.json, commit, then tag and push.
+#   git tag v1.1.0 && git push origin v1.1.0
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required for the registry to verify this workflow's identity.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      # Trusted publishing needs a newer npm than the one bundled with the Node runtime.
+      - name: Use an npm that supports trusted publishing
+        run: npm install -g npm@latest
+
+      - name: Fail if the tag and package version disagree
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $PACKAGE_VERSION"
+            exit 1
+          fi
+
+      - run: npm publish --access public
