@@ -8,7 +8,7 @@
   "homepage": "https://badlads.chemicalheads.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chemicalHeadsStudios/as-badlads"
+    "url": "git+https://github.com/ChemicalHeadsStudios/as-badlads.git"
   },
   "scripts": {
     "test": "node tests",
