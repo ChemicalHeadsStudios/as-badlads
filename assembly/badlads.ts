@@ -1,20 +1,28 @@
 /**
- * BadLads plugin import function signatures. The current plugin BadLads plugin implementation lacks any runtime event registartion... 
- * it simply scans the WASM for matching event signatures and ticks them off. The scan is done on plugin load/hot-reload. 
+ * BadLads plugin import function signatures. The current BadLads plugin implementation lacks any runtime event registration...
+ * it simply scans the WASM for matching event signatures and ticks them off. The scan is done on plugin load/hot-reload.
  * These cannot have an outer namespace/scope, must be defined on the global scope aka "". If you don't know what that means -- don't worry about it.
- * 
+ *
  * ```typescript
- * export function onPluginStop(pluginId: i32): void {} 
+ * export function onPluginStop(pluginId: i32): void {}
  * export function onPluginStart(pluginId: i32): void {}
  * export function onPluginTick(deltaTime: f64): void {}
  * export function onPlayerLogin(playerState: BadLadsObject): void {}
  * export function onPlayerLogout(playerState: BadLadsObject): void {}
- * export function onPlayerChatMessage(playerState: BadLadsObject, messageBuffer: ArrayBuffer, channel_index: i32): bool {return true;}
+ * export function onPlayerChatMessage(playerState: BadLadsObject, messageBuffer: ArrayBuffer, channelIndex: i32): bool {return true;}
  * export function onLivingDeath(victim: BadLadsObject, killerPlayerState: BadLadsObject): void {}
  * export function onBecomeJob(playerState: BadLadsObject, jobName: ArrayBuffer): void {}
  * ```
- * 
- * Some comments are written as an implementation guide for other languages.  
+ *
+ * The scan matches on name alone and never on type, so an export whose parameters disagree with the list above is
+ * still hooked up and then misreads its arguments. Copy these signatures exactly.
+ *
+ * onPlayerChatMessage is the only event whose return value is read; returning false stops the message. onLivingDeath
+ * covers anything with a living component rather than players alone, so `victim` is not always a player character,
+ * and `killerPlayerState` is 0 for a death nobody caused. onPluginTick runs at a rate the server operator sets
+ * rather than once per frame, and `deltaTime` measures from that plugin's previous tick.
+ *
+ * Some comments are written as an implementation guide for other languages.
  **/
 export declare type HOVER_OVER_ME_README = bool;
 
@@ -74,6 +82,9 @@ export declare function __hostGetItemDefinitionIdByName(namePtr: ArrayBuffer, nu
 export declare function __hostGetObjectHealth(object: BadLadsObject): i32;
 export declare function __hostGetObjectMaxHealth(object: BadLadsObject): i32;
 export declare function __hostGetPlayerMoney(playerState: BadLadsObject): i32;
+export declare function __hostAddPlayerMoney(playerState: BadLadsObject, amount: i32): bool;
+export declare function __hostGetCharacterPlayerState(character: BadLadsObject): BadLadsObject;
+export declare function __hostRaytraceObject(ignoredObject: BadLadsObject, collisionChannel: i32, startX: f32, startY: f32, startZ: f32, endX: f32, endY: f32, endZ: f32): BadLadsObject;
 
 
 // The three functions below are responsible for guest memory allocation. We allocate a piece of memory when we want to pass a string or any kind of buffer to the guest (us).
@@ -663,4 +674,41 @@ export function getLivingMaxHealth(object: BadLadsObject): i32 {
 @inline
 export function getPlayerMoney(playerState: BadLadsObject): i32 {
     return __hostGetPlayerMoney(playerState);
+}
+
+/**
+ * Adjusts a player's balance by a signed amount. A negative amount is a charge, and is refused whole rather than
+ * taking a balance below zero, so `false` from a charge means the player could not afford it.
+ * @param amount positive to pay, negative to charge.
+ * @returns whether the balance changed. Read the resulting figure back with `getPlayerMoney`.
+ */
+// @ts-ignore
+@inline
+export function addPlayerMoney(playerState: BadLadsObject, amount: i32): bool {
+    return __hostAddPlayerMoney(playerState, amount);
+}
+
+/**
+ * Returns the PlayerState owning a PlayerCharacter, the reverse of `getPlayerCharacter`. Use it to get from an
+ * object you were handed -- an event victim, a trace hit -- to the player APIs, which all take a PlayerState.
+ * @returns 0 for a character no player owns, such as an AI.
+ */
+// @ts-ignore
+@inline
+export function getCharacterPlayerState(character: BadLadsObject): BadLadsObject {
+    return __hostGetCharacterPlayerState(character);
+}
+
+/**
+ * The same trace as `rayTrace`, reporting what was hit rather than how far away it was. Call both if you need
+ * both; they are separate traces.
+ * @param start The start of the line.
+ * @param end The end of the line.
+ * @param collisionChannel collision world channel.
+ * @returns the object that was hit, or 0 for no hit and for scenery that has no object id of its own.
+ */
+// @ts-ignore
+@inline
+export function rayTraceObject(start: Vector, end: Vector, collisionChannel: BadLadsCollisionChannel = BadLadsCollisionChannel.WorldStatic, ignoredObject: BadLadsObject = 0): BadLadsObject {
+    return __hostRaytraceObject(ignoredObject, collisionChannel, start.x, start.y, start.z, end.x, end.y, end.z);
 }
