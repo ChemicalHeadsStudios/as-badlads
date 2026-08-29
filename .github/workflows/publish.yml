@@ -29,7 +29,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # Current npm requires node 22 or newer; the version bundled with older runtimes predates trusted
+          # publishing, so both have to move together.
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
       # Trusted publishing needs a newer npm than the one bundled with the Node runtime.
