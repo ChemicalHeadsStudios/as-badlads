@@ -85,6 +85,8 @@ export declare function __hostGetPlayerMoney(playerState: BadLadsObject): i32;
 export declare function __hostAddPlayerMoney(playerState: BadLadsObject, amount: i32): bool;
 export declare function __hostGetCharacterPlayerState(character: BadLadsObject): BadLadsObject;
 export declare function __hostRaytraceObject(ignoredObject: BadLadsObject, collisionChannel: i32, startX: f32, startY: f32, startZ: f32, endX: f32, endY: f32, endZ: f32): BadLadsObject;
+export declare function __hostSetTimeOfDay(hours: f32): bool;
+export declare function __hostGetTimeOfDay(): f32;
 
 
 // The three functions below are responsible for guest memory allocation. We allocate a piece of memory when we want to pass a string or any kind of buffer to the guest (us).
@@ -540,6 +542,26 @@ export function getGameTime(): f64  {
 @inline
 export function getEconomyCurrencyValue(): f32 {
     return __hostGetEconomyCurrencyValue();
+}
+
+/**
+ * Moves the day to a solar hour for everyone, like the `/settime` command. The day keeps running from there.
+ * @param hours The hour of the day as a decimal, 0 to 24: 18.5 is half past six in the evening.
+ * @returns false when the hour is out of range, true when the day was moved.
+ */
+// @ts-ignore
+@inline
+export function setTimeOfDay(hours: f32): bool {
+    return __hostSetTimeOfDay(hours);
+}
+
+/**
+ * @returns the solar hour the day stands at now, 0 to 24, or -1 when the world has no sun.
+ */
+// @ts-ignore
+@inline
+export function getTimeOfDay(): f32 {
+    return __hostGetTimeOfDay();
 }
 
 /**
